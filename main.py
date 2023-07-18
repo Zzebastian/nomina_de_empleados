@@ -1,13 +1,13 @@
-import json
-
+import os, json
+os.system("cls")
 try:
-  with open("Datos_Empleados.json") as file:
+  with open("nomina_de_empleados/Datos_Empleados.json") as file:
     BdD = json.load(file)
 except:
   BdD ={}
-
+  
 def _cargarDatosJSON(BdD):
-  with open("Datos_Empleados.json", "w") as file:
+  with open("nomina_de_empleados/Datos_Empleados.json", "w") as file:
     json.dump(BdD, file)
 #
 def _verificarAccion(text):
