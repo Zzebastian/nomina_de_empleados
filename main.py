@@ -5,7 +5,12 @@ try:
     BdD = json.load(file)
 except:
   BdD ={}
-  
+
+textos = {"agregarNombre" : "Ingrese el Nombre: \033[34m",
+            "agregarApellido" : "Ingrese el Apellido: \033[34m",
+            "agregarCategoria" : """(P)eon, (A)dministrativo (G)erente", "Sólo es posible ingresar \033[32m p a g\033[0m""",
+            "ingresarMail": "Ingrese un email válido: \033[34m"}
+
 def _cargarDatosJSON(BdD):
   with open("nomina_de_empleados/Datos_Empleados.json", "w") as file:
     json.dump(BdD, file)
@@ -32,7 +37,7 @@ def _opcionMultiple(text, opciones = ["s", "n"], siError ="solo (s)i y (n)o son 
 # 
 def _verificarEmail():
   while True:
-    mail = input("Ingrese un email válido: \033[34m")
+    mail = input(textos["ingresarMail"])
     print(" \033[0m")
     ch1=mail.find("@")
     ch2=mail.find(".com")
@@ -43,8 +48,13 @@ def _verificarEmail():
 #
 def _actualizarDiccionarioJSON(id,BdD):
   for key in BdD[id].keys():
-    text = f"Desea modificar el {key}: "
-    conf = _opcionMultiple(text)
+    print(f"Si desea modificar el {key}, ingrese el nuevo valor")
+    print("""caso contrario, ingrese "enter" """)
+    nuevoValor = input("->")
+    if nuevoValor == 0:
+      continue
+    print(f"¿Es {key} el valor correcto? ingrese (s)i o (n)o")
+    conf = _opcionMultiple("->")
     if conf == "s":
       text = f"Ingrese el nuevo {key}: \033[34m"
       BdD[id][key] = _verificarAccion(text)
@@ -52,12 +62,12 @@ def _actualizarDiccionarioJSON(id,BdD):
 def agregarEmpleado():
   global BdD
   id = len(BdD) + 1
-  text = "Ingrese el Nombre: \033[34m"
-  nombre = _verificarAccion(text)
-  text = "Ingrese el Apellido: \033[34m"
-  apellido = _verificarAccion(text)
+  
+  nombre = _verificarAccion(textos["agregarNombre"])
+  
+  apellido = _verificarAccion(textos["agregarApellido"])
   print("Ingrese el puesto en el que trabajará: ")
-  puesto = _opcionMultiple("(P)eon, (A)dministrativo (G)erente", "Sólo es posible ingresar \033[32m p a g\033[0m")
+  puesto = _opcionMultiple(textos["agregarCategoria"])
   mail = _verificarEmail()
   empleado = {"Nombre": nombre,
               "Apellido": apellido,
@@ -76,49 +86,50 @@ def actualizarEmpleado():
     try:
       id = input("Ingrese el id del empleado ")
       id = int(id)
+      if id > len(BdD)+1 and id <= 0:
+        print("El id ingresado no pertenece a la base de datos")
+        continue
       ID = str(id)
       if BdD[ID] == None:
         print("")
-        print("Empleado Eliminado")
+        print("El empleado ha sido eliminado previamente")
         print("")
         break
     except:
+      print("El id ingresado debe ser un número entero positivo")
       continue
-    if id <= len(BdD)+1 and id > 0:
-      text= f"""Desea modificar los datos correpondientes a {BdD[ID]["Nombre"]}, {BdD[ID]["Apellido"]} """
-      conf= _opcionMultiple(text)
-      if conf == "s":
-        _actualizarDiccionarioJSON(ID,BdD)
-        _cargarDatosJSON(BdD)
-        print("El proceso fue exitoso")
-        for key in BdD[ID].keys():
-          print(f"{key:<10} | {BdD[ID][key]}")
-        break   
-      else:
-        print("No se han realizado cambios en la base de datos")
-        break
+    print(f"""Desea modificar los datos correpondientes a {BdD[ID]["Nombre"]}, {BdD[ID]["Apellido"]} """)
+    conf= _opcionMultiple("->")
+    if conf == "s":
+      _actualizarDiccionarioJSON(ID,BdD)
+      _cargarDatosJSON(BdD)
+      print("El proceso fue exitoso")
+      for key in BdD[ID].keys():
+        print(f"{key:<10} | {BdD[ID][key]}")
+      break   
     else:
-      continue
+      print("No se han realizado cambios en la base de datos")
+      break
 #
 def borrarUsuario():
   global BdD
   while True:
     try:
-      id = input("Ingrese el id del empleado ")
-      id = int(id)
-      ID = str(id)
-      if BdD[ID] == None:
+      userId = input("Ingrese el id del empleado ")
+      userId = int(userId)
+      userId_str = str(userId)
+      if BdD[userId_str] == None:
         print("")
         print("Empleado Eliminado")
         print("")
         break
     except:
       continue
-    if id <= len(BdD)+1 and id > 0:
-      text= f"""Desea eliminar a {BdD[ID]["Nombre"]}, {BdD[ID]["Apellido"]} """
+    if userId <= len(BdD)+1 and userId > 0:
+      text= f"""Desea eliminar a {BdD[userId_str]["Nombre"]}, {BdD[userId_str]["Apellido"]} """
       conf= _opcionMultiple(text)
       if conf == "s":
-        BdD[ID] = None
+        BdD[userId] = None
         _cargarDatosJSON(BdD)
         print("El proceso eliminación fue exitoso")
         break
@@ -128,7 +139,7 @@ def borrarUsuario():
     else:
       continue
 #
-def verBdD():
+def verBdD(): #Imprime de forma atractiva la Base de datos
   global BdD
   for id in BdD.keys():
     ID = str(id)
