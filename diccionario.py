@@ -1,0 +1,16 @@
+textos = {"agregarNombre" : "Ingrese el Nombre: \033[34m",
+            "agregarApellido" : "Ingrese el Apellido: \033[34m",
+            "agregarCategoria" : """(P)eon, (A)dministrativo (G)erente", "Sólo es posible ingresar \033[32m p a g\033[0m""",
+            "ingresarMail": "Ingrese un email válido: \033[34m",
+            "preguntaPuesto": "Ingrese el puesto en el que trabajará: ",
+            "preguntaId": "Ingrese el id del empleado ",
+            "exito": "El proceso fue exitoso",
+            "idDesconocido": "El id ingresado no pertenece a la base de datos",
+            "idErroneo": "El id ingresado debe ser un número entero positivo",
+            "empleadoYaEliminado": "El empleado ha sido eliminado previamente",
+            "procesoExitoso": "El proceso fue exitoso",
+            "sinCambios": "No se han realizado cambios en la base de datos",
+            "empleadoEliminado": "Empleado Eliminado",
+            "exit": "Gracias por utilizar la Base de datos",
+            }
+            # diccionario.textos[""]
