@@ -1,4 +1,5 @@
 import os, json
+
 os.system("cls")
 
 import funciones, diccionario
@@ -6,10 +7,9 @@ import funciones, diccionario
 def agregarEmpleado():
   while True:
     nombre = input(diccionario.textos["agregarNombre"])
-    print("")
     apellido = input(diccionario.textos["agregarApellido"])
-    print("")
-    puestoKey = funciones.opcionMultiple(diccionario.textos["agregarCategoria"], ["p", "a", "g"],diccionario.textos["errorCategoría"])
+    
+    puestoKey = funciones.opcionMultiple(diccionario.textos["agregarCategoria"], diccionario.puestos.keys(),diccionario.textos["errorCategoría"])
     puesto = diccionario.puestos[puestoKey]
     print("")
     mail = funciones.verificarEmail()
@@ -28,7 +28,7 @@ def agregarEmpleado():
       break
 
   funciones.guardarEmpleadoBdD(empleado)
-  print(diccionario.textos["exito"])
+  print(diccionario.textos["procesoExitoso"])
 #
 def actualizarEmpleado():
   while True:
@@ -37,7 +37,7 @@ def actualizarEmpleado():
       print("\033[0m")
       empleado = funciones.obtenerEmpleadoBdD(emplId)
     except:
-      print(diccionario.textos["idErroneo"])
+      print(diccionario.textos["idDesconocido"])
       continue
     
     print("\033[0m")
@@ -48,6 +48,8 @@ def actualizarEmpleado():
     if conf.lower() == "s":
       funciones.modificarEmpleado(empleado)
       print(diccionario.textos["procesoExitoso"])
+      for key in empleado:
+        print(f'{key:<10} | {empleado[key]:<10}')
       break   
     else:
       print(diccionario.textos["sinCambios"])
@@ -59,7 +61,6 @@ def borrarEmpleado():
       emplId = input(diccionario.textos["preguntaId"])
       print("\033[0m")
       funciones.obtenerEmpleadoBdD(emplId)
-      print("")
       break
     except:
       print(diccionario.textos["idDesconocido"])
@@ -72,25 +73,30 @@ def borrarEmpleado():
     print((diccionario.textos["sinCambios"]))
 #
 def opcionesIniciales():
+  #Verifica e inicializa la Base de datos en caso de ser necesario
+  funciones.VerificarBdD()
+
   while True:
-    print("")
-    print("Qué desea hacer? \n ")
-    print("1) Agregar Empleado")
-    print("2) Actualizar Empleado")
-    print("3) Borrar Empleado")
-    print("4) Ver Base de Datos")
-    print("S) Salir")
-    opcion = funciones.opcionMultiple("-> \033[34m", ["1", "2", "3", "4", "s"], "Solo \033[31m1, 2, 3 o 4 o S\033[0m son valores posibles")
+    
+    print(diccionario.entrada["Inicial"])
+    print(diccionario.entrada["Agregar"])
+    print(diccionario.entrada["Actualizar"])
+    print(diccionario.entrada["Borrar"])
+    print(diccionario.entrada["Ver"])
+    print(diccionario.entrada["Salir"])
+    opcion = funciones.opcionMultiple("-> \033[34m", diccionario.entrada["Opciones"].values(), diccionario.entrada["Problema"])
     print("\033[0m")
-    if opcion == "1":
+
+    if opcion == diccionario.entrada["Opciones"]['agregar']:
       agregarEmpleado()
-    elif opcion == "2":
+    elif opcion == diccionario.entrada["Opciones"]['actualizar']:
       actualizarEmpleado()
-    elif opcion == "3":
+    elif opcion == diccionario.entrada["Opciones"]['borrar']:
       borrarEmpleado()
-    elif opcion == "4":
+    elif opcion == diccionario.entrada["Opciones"]['ver']:
       funciones.imprimirBdD()
     else:
+      funciones.cerrarBdD()
       print(diccionario.textos["exit"])
       break
 #

@@ -1,93 +1,84 @@
 import json, sqlite3
 import diccionario
-pathBdD = 'nomina_de_empleados/Datos_de_Empleados.db'
-# Operaciones sobre la base de datos
 
+# Operaciones sobre la base de datos
+pathBdD = 'nomina_de_empleados/Datos_de_Empleados.db'
 conexion = None
 
 def VerificarBdD():
     # Obtiene los datos guardados en la base de datos, o bien
     # En caso de no tener, Re-crea la Base de Datos de prueba
-    global conexion
+    global conexion, cursor
     if conexion != None:
       conexion.commit()
       conexion.close()
+
     try:
         conexion = sqlite3.connect(pathBdD)
         cursor = conexion.cursor()
         cursor.execute('SELECT * FROM datos_empleados')
-        
         conexion.commit()
-        conexion.close()
+        
     except:
         import Database_Empleados
         imprimirBdD()
 #
 def imprimirBdD():
-  conexion = sqlite3.connect(pathBdD)
-  cursor = conexion.cursor()
+  global conexion, cursor
 
   cursor.execute('SELECT * FROM datos_empleados')
-
   registros = cursor.fetchall()
 
-  print(f"\033[32m{diccionario.tabla[0]:<10} | {diccionario.tabla[1]:<15} | {diccionario.tabla[2]:<15} | {diccionario.tabla[3]:<15} | {diccionario.tabla[4]:<10}\033[0m")
+  print(f"\033[32m{diccionario.tabla[0]:<10} | {diccionario.tabla[1]:<15} | {diccionario.tabla[2]:<15} | \
+        {diccionario.tabla[3]:<15} | {diccionario.tabla[4]:<10}\033[0m")
 
   for registro in registros:
       print(f'{registro[0]:<10} | {registro[1]:<15} | {registro[2]:<15} | {registro[3]:<15} | {registro[4]:<10}')
   
   conexion.commit()
-  conexion.close()
 #
 def guardarEmpleadoBdD(empleado):
-  conexion = sqlite3.connect(pathBdD)
-  cursor = conexion.cursor()
-  cursor.execute(f'INSERT INTO datos_empleados (nombre, apellido, puesto, mail) \
-                  VALUES ("{empleado["Nombre"]}", "{empleado["Apellido"]}", "{empleado["Puesto"]}", "{empleado["mail"]}")')
-  
+  global conexion, cursor
+
+  cursor.execute('INSERT INTO datos_empleados (nombre, apellido, puesto, mail) VALUES (?, ?, ?, ?)',
+                 (empleado["Nombre"], empleado["Apellido"], empleado["Puesto"], empleado["mail"]))
   conexion.commit()
-  conexion.close()
 #
 def obtenerEmpleadoBdD(id):
-  conexion = sqlite3.connect(pathBdD)
-  cursor = conexion.cursor()
-  cursor.execute(f'''SELECT * FROM datos_empleados WHERE idEmpleado={id}''')
-  
+  global conexion, cursor
+
+  cursor.execute('SELECT * FROM datos_empleados WHERE idEmpleado=?',(id))
   registro = cursor.fetchall()
+  
   empleado = {"ID": registro[0][0],
               "Nombre": registro[0][1],
               "Apellido": registro[0][2],
               "Puesto": registro[0][3], 
               "Mail": registro[0][4],
             }
+  
   for data in empleado:
       print(f"{data:<10} | {empleado[data]}")
-  
-  conexion.commit()
-  conexion.close()
+  print("")
 
+  conexion.commit()
   return empleado
 #
 def actualizarEmpleadoBdD(empleado):
-  print("seguir acá")
-  print(empleado)
-  
-  conexion = sqlite3.connect(pathBdD)
-  cursor = conexion.cursor()
-  cursor.execute(f'UPDATE datos_empleados SET nombre = "{empleado["Nombre"]}", apellido = "{empleado["Apellido"]}", \
-                 puesto = "{empleado["Puesto"]}", mail = "{empleado["Mail"]}" \
-                  WHERE idEmpleado = "{empleado["ID"]}"')
-  
+  global conexion, cursor
+
+  cursor.execute(f'UPDATE datos_empleados SET nombre = ?, apellido = ?, puesto = ?, mail = ? WHERE idEmpleado = ?',
+                 (empleado["Nombre"], empleado["Apellido"], empleado["Puesto"], empleado["Mail"], empleado["ID"]))
   conexion.commit()
-  conexion.close()
 #
 def borrarEmpleadoBdD(id):
-  conexion = sqlite3.connect(pathBdD)
-  cursor = conexion.cursor()
-  cursor.execute('SELECT * FROM datos_empleados')
-  cursor.execute(f'DELETE FROM datos_empleados WHERE idEmpleado={id}')
-  
+  global conexion, cursor
+
+  cursor.execute('DELETE FROM datos_empleados WHERE idEmpleado=?',id)
   conexion.commit()
+#
+def cerrarBdD():
+  global conexion, cursor
   conexion.close()
 #
 
@@ -110,7 +101,7 @@ def opcionMultiple(text, opciones = ["s", "n"], siError ="solo (s)i y (n)o son o
       print(siError)
     else:
       break
-  return (opcion)
+  return (opcion.lower())
 # 
 def verificarEmail():
   while True:
